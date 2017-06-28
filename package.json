@@ -1,0 +1,23 @@
+{
+  "name": "dvla-vehicle-information",
+  "version": "1.0.0",
+  "description": "A very ugly library to request basic vehicle infomation from the Gov.uk website.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gateway.jameslakin.co.uk/git/james.lakin/dvla-vehicle-information.git"
+  },
+  "keywords": [
+    "dvla"
+  ],
+  "author": "James Lakin",
+  "license": "GPL-2.0",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.1",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1"
+  }
+}
