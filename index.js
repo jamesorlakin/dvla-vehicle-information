@@ -9,6 +9,8 @@ inoperable.
 var rp = require('request-promise');
 var cheerio = require('cheerio');
 
+var userCallback;
+
 function doConfirmation(numberplate) {
     var options = {
         method: 'POST',
@@ -20,6 +22,7 @@ function doConfirmation(numberplate) {
         },
         formData: { Vrm: numberplate }
     };
+
     rp(options).then(function (data) {
         var page = cheerio.load(data);
         var formData = page("input").toArray().map(function (item) {
@@ -33,19 +36,43 @@ function doConfirmation(numberplate) {
             if (item == undefined) return false;
             return true;
         });
+        console.log("Done 1");
         fetchVehicleDetails(formData);
     })
 }
 
 function fetchVehicleDetails(formData) {
     var postData = {};
-    formData.forEach(function (item) {
+    formData.forEach(function (item) { // Get the values in a suitable format for the HTTP request
         postData[item.name] = item.value;
     });
-    console.log(postData);
+    var options = {
+        method: 'POST',
+        url: 'https://vehicleenquiry.service.gov.uk/ViewVehicle',
+        headers:
+        {
+            'cache-control': 'no-cache',
+            'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
+        },
+        formData: postData
+    };
+
+    rp(options).then(function (data) {
+        var page = cheerio.load(data);
+
+        var vehicleInformation = {
+            taxDate: page(".status-bar").children().first().children().first().children("p").text(),
+            taxed: page(".status-bar").children().first().children().first().children("h2").text(),
+            motDate: page(".status-bar").children().last().children().first().children("p").text(),
+            mot: page(".status-bar").children().last().children().first().children("h2").text()
+        }
+        console.log(vehicleInformation);
+    });
 }
 
 module.exports = function(numberplate, callback) {
+    userCallback = callback;
     numberplate = numberplate.toLowerCase().replace(' ', '');
+    console.log("Doing 1");
     doConfirmation(numberplate);
 }
