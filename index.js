@@ -67,6 +67,7 @@ function fetchVehicleDetails(formData) {
             mot: page(".status-bar").children().last().children().first().children("h2").text()
         }
         console.log(vehicleInformation);
+        userCallback(vehicleInformation);
     });
 }
 
