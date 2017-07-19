@@ -72,7 +72,9 @@ function fetchVehicleDetails(formData) {
 
         page('.list-summary').children().each(function(i, element) { // Fetch every row from the table
             var key = page(this).children().first().text();
-            vehicleInformation[key.substr(0, key.length)] = page(this).children().last().text()
+            if (key == "Tax rates: ") return true; // Skip the tax rates link
+            // Why strip two characters? Get rid of the ": ".
+            vehicleInformation[key.substr(0, key.length-2)] = page(this).children().last().text()
         });
 
         userCallback(vehicleInformation);
