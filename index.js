@@ -2,8 +2,12 @@
 dvla-vehicle-information by James Lakin.
 
 This library emulates the HTTP requests a browser makes when using the GOV.UK's
-Vehicle Enquiry service. As such changes in the web design could render this library
-inoperable.
+Vehicle Enquiry service and parses the returned HTML. As such, changes in the
+web design could render this library inoperable.
+
+There are two HTTP requsts:
+First, we run the "doConfirmation" function to get the viewstate input.
+Then we run the "fetchVehicleDetails" function to return the full data about a vehicle.
 */
 
 var rp = require('request-promise');
@@ -36,7 +40,6 @@ function doConfirmation(numberplate) {
             if (item == undefined) return false;
             return true;
         });
-        console.log("Done 1");
         fetchVehicleDetails(formData);
     })
 }
@@ -61,12 +64,17 @@ function fetchVehicleDetails(formData) {
         var page = cheerio.load(data);
 
         var vehicleInformation = {
-            taxDate: page(".status-bar").children().first().children().first().children("p").text(),
-            taxed: page(".status-bar").children().first().children().first().children("h2").text(),
-            motDate: page(".status-bar").children().last().children().first().children("p").text(),
-            mot: page(".status-bar").children().last().children().first().children("h2").text()
+            taxDate: page(".status-bar").children().first().children().first().children("p").text().substr(8),
+            taxed: !(page(".status-bar").children().first().children().first().children("h2").text().indexOf("Untaxed")>-1),
+            motDate: page(".status-bar").children().last().children().first().children("p").text().substr(8),
+            mot: !(page(".status-bar").children().last().children().first().children("h2").text().indexOf("No")>-1)
         }
-        console.log(vehicleInformation);
+
+        page('.list-summary').children().each(function(i, element) { // Fetch every row from the table
+            var key = page(this).children().first().text();
+            vehicleInformation[key.substr(0, key.length)] = page(this).children().last().text()
+        });
+
         userCallback(vehicleInformation);
     });
 }
@@ -74,6 +82,5 @@ function fetchVehicleDetails(formData) {
 module.exports = function(numberplate, callback) {
     userCallback = callback;
     numberplate = numberplate.toLowerCase().replace(' ', '');
-    console.log("Doing 1");
     doConfirmation(numberplate);
 }
