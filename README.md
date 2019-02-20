@@ -1,3 +1,5 @@
+**Unmaintained** - This was one of my first JS libraries and, well, it shows. I was very new to the JS world then, and I'm quite horrified by my usage of cheerio. This library is very tiny, so I suggest writing a small one of your own - it'll be quite a bit better!
+
 # dvla-vehicle-information
 
 A very ugly library to request basic vehicle infomation from the GOV.UK website. Works by making a couple of HTTP requests that a browser normally would, and then scrapes the resulting HTML. Very hacky, but there's no official API that I can see.
